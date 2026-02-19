@@ -103,6 +103,9 @@ EOF
     cat > "${MANIFEST}" <<JSON
 {
   "name": "${MARKETPLACE_NAME}",
+  "owner": {
+    "name": "${USER}"
+  },
   "plugins": ${plugins_json}
 }
 JSON
