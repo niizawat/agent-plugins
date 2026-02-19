@@ -1,0 +1,13 @@
+{
+  "name": "install-cursor-plugin",
+  "description": "Cursor IDE用プラグインをClaude Codeプラグイン形式に変換してインストールするスキル",
+  "version": "1.0.0",
+  "author": "niizawat",
+  "skills": [
+    {
+      "name": "install-cursor-plugin",
+      "path": "skills/install-cursor-plugin/SKILL.md",
+      "description": "Cursor Pluginを変換してClaude Codeにインストールする"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "agent-plugins",
+  "owner": {
+    "name": "niizawat"
+  },
+  "plugins": [
+    {
+      "name": "install-cursor-plugin",
+      "source": "./plugins/install-cursor-plugin",
+      "version": "1.0.0"
+    }
+  ]
+}
