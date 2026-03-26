@@ -70,9 +70,10 @@ If PNG is generated successfully, use the Read tool to load the PNG image and vi
 
 1. **アイコン重なり** — 任意の AWS サービスアイコンが視覚的に重なっていないか
 2. **ラベル可読性** — アイコンラベルが切れずに表示されているか
-3. **エッジラベル重なり** — 接続線のラベルがアイコンラベルと重なっていないか
-4. **コンテナ収容** — アイコンが VPC / サブネットの枠内に完全に収まっているか
-5. **全体バランス** — 図全体が均等に配置されて読みやすいか
+3. **エッジラベル重なり** — 接続線のラベルがアイコン本体・アイコンラベルと重なっていないか（**特に長い接続線の中間点付近に別アイコンが存在する場合を重点確認**）
+4. **エッジラベルとアイコンの近接** — 接続線のラベルが、source/target 以外のアイコンに近接していないか（ラベルが経路途中のアイコンに"かぶって"いないか）
+5. **コンテナ収容** — アイコンが VPC / サブネットの枠内に完全に収まっているか
+6. **全体バランス** — 図全体が均等に配置されて読みやすいか
 
 視覚的に発見した問題は `VISUAL-WARNING` として報告する（XML ルール R01–R12 とは別扱い）。
 
@@ -163,22 +164,48 @@ All edge cells (`edge="1"`) should have `edgeStyle=orthogonalEdgeStyle` in their
 
 **Violation**: Report edge IDs that use a different or no edge style.
 
-### R10 — Edge Label on Short Connection (WARNING)
+### R10 — Edge Label Proximity to Icons (WARNING)
 
-For edges with a non-empty `value` (label), find the source and target icon cells and compute the straight-line distance between their centers:
+For every edge with a non-empty `value` (label), run **two independent checks**:
+
+#### Check A — Short connection (source-target distance)
 
 ```text
-source_cell = find mxCell with id == edge.source
-target_cell = find mxCell with id == edge.target
-distance = sqrt((x2-x1)^2 + (y2-y1)^2)
+source_center = (source.x + source.width/2, source.y + source.height/2)
+target_center = (target.x + target.width/2, target.y + target.height/2)
+distance = sqrt((cx2-cx1)^2 + (cy2-cy1)^2)
 
-if distance < 200 AND edge.value != "":
-    → label overlap risk
+if distance < 200:
+    → label overlap risk with source or target icon
 ```
 
-When an edge with a label connects two icons whose centers are less than 200px apart, the label likely overlaps one of the icon labels. Either remove the edge label (use empty `value=""`) or increase the icon spacing.
+#### Check B — Label midpoint proximity to ANY icon
 
-**Violation**: Report edge ID, label text, source/target IDs, and actual center distance.
+Estimate the default label position as the midpoint between source center and target center, then apply any `<mxPoint as="offset">` adjustment:
+
+```text
+label_x = (source_center.x + target_center.x) / 2 + offset_x  (default offset = 0)
+label_y = (source_center.y + target_center.y) / 2 + offset_y  (default offset = 0)
+```
+
+> **Note**: source/target coordinates are relative to their parent container. Convert to absolute by adding the parent container's absolute position (recursively up the parent chain) before computing label_x/label_y.
+
+For every icon cell that is **not** the edge's source or target:
+
+```text
+icon_abs_x = icon.x + sum of parent absolute x offsets
+icon_abs_y = icon.y + sum of parent absolute y offsets
+
+label_bbox_x1 = icon_abs_x - 60   (label text ~60px to the left of icon center)
+label_bbox_x2 = icon_abs_x + 120  (icon 60px + 60px right margin)
+label_bbox_y1 = icon_abs_y - 20   (icon top)
+label_bbox_y2 = icon_abs_y + 100  (icon 60px + 40px label below)
+
+if label_x in [label_bbox_x1, label_bbox_x2] AND label_y in [label_bbox_y1, label_bbox_y2]:
+    → edge label overlaps with this icon
+```
+
+**Violation**: Report edge ID, label text, source/target IDs, center distance (Check A), and for Check B report the overlapping icon ID and approximate label position.
 
 ### R11 — Containers Have Children (INFO)
 

@@ -227,6 +227,16 @@ Assign specific Y coordinates to prevent overlap:
 - `labelBackgroundColor=#ffffff;labelBorderColor=none;` を追加して可読性を上げる
 - **最優先ルール**: アイコンラベルとエッジラベルの境界ボックスが重なる場合、必ずアイコン間隔を広げること
 
+**中間アイコンとの重なり防止（長い接続線のラベル）**:
+
+長い接続線（source-target 距離 > 200px）にもラベルを付ける場合、ラベルのデフォルト表示位置（中点）が **source/target 以外の別アイコン** と重なる可能性がある。
+
+- 接続前に「ラベル中点 ≈ (source_abs_cx + target_abs_cx)/2, (source_abs_cy + target_abs_cy)/2」を計算する
+- その座標から 120px 以内に別アイコンの中心がある場合:
+  1. `<mxPoint x="..." y="..." as="offset"/>` でラベルをアイコンから遠ざける、または
+  2. ラベルを削除して矢印だけにする（ラベル情報は tooltip や別の接続に移す）
+- 左列（外部リソース列）と VPC 内リソースを結ぶ横方向の長い接続線は特に注意。ラベル中点が左列アイコン（WAF/CloudFront 等）と重なりやすい
+
 ---
 
 ## Phase 3: DrawIO XML Generation
