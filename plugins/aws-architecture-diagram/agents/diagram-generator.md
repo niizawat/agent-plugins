@@ -213,6 +213,7 @@ Assign specific Y coordinates to prevent overlap:
 ### Connection Routing
 
 - Use **orthogonal** edge style (`edgeStyle=orthogonalEdgeStyle`) for all connections
+- Add **`jumpStyle=arc`** to all edges — 線が交差する箇所に円弧ジャンプを表示し可読性を確保する
 - Traffic flow arrows should point in the direction of request/data flow
 - Avoid edge crossings where possible by routing around containers
 - Use **dashed lines** for indirect/async connections (SQS, SNS, EventBridge triggers)
@@ -306,10 +307,12 @@ Use AWS 2026 icon shapes. Consult `skills/drawio-xml-format/references/aws-shape
 **Connection/edge pattern**:
 
 ```xml
-<mxCell id="edge-1" value="HTTPS" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="alb-1" target="ecs-1" parent="layer-3">
+<mxCell id="edge-1" value="HTTPS" style="edgeStyle=orthogonalEdgeStyle;jumpStyle=arc;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="alb-1" target="ecs-1" parent="layer-3">
   <mxGeometry relative="1" as="geometry" />
 </mxCell>
 ```
+
+> **必須**: `jumpStyle=arc` は全エッジに必ず含めること。線が交差する箇所で円弧ジャンプを表示し、接続関係を視覚的に区別できるようにする。
 
 ### Parent Assignment Rules
 

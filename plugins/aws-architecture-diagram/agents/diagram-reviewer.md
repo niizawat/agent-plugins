@@ -170,11 +170,14 @@ Resource icon cells should have `style` containing `shape=mxgraph.aws4.` or `res
 
 **Violation**: Report any cell with `shape=mxgraph.` that does NOT use the `aws4` prefix (e.g., `mxgraph.aws3.`).
 
-### R09 — Edge Style (WARNING)
+### R09 — Edge Style (ERROR)
 
-All edge cells (`edge="1"`) should have `edgeStyle=orthogonalEdgeStyle` in their `style` attribute.
+All edge cells (`edge="1"`) must have **both** of the following in their `style` attribute:
 
-**Violation**: Report edge IDs that use a different or no edge style.
+- `edgeStyle=orthogonalEdgeStyle` — orthogonal routing
+- `jumpStyle=arc` — arc jump (円弧) where lines cross each other
+
+**Violation**: Report edge IDs that are missing either property.
 
 ### R10 — Edge Label Proximity to Icons (ERROR)
 
