@@ -166,46 +166,76 @@ All edge cells (`edge="1"`) should have `edgeStyle=orthogonalEdgeStyle` in their
 
 ### R10 — Edge Label Proximity to Icons (WARNING)
 
-For every edge with a non-empty `value` (label), run **two independent checks**:
+For every edge with a non-empty `value` (label), run **two independent checks**.
+
+#### Step 0 — Compute absolute coordinates for all cells
+
+Before running any check, convert every cell's (x, y) to **absolute coordinates** by traversing the parent chain up to `id="1"`:
+
+```text
+abs_x(cell) = cell.x + abs_x(parent)   [parent="1" has abs_x=0]
+abs_y(cell) = cell.y + abs_y(parent)   [parent="1" has abs_y=0]
+```
+
+For container cells (VPC, subnet, AZ): their absolute coordinates are the sum of all ancestor offsets.
+
+Example from a real diagram:
+
+- `vpc-main`: x=580, y=140, parent="layer-1" → abs (580, 140)
+- `az-1a`: x=30, y=160, parent="vpc-main" → abs (610, 300)
+- `subnet-pub-1a`: x=20, y=60, parent="az-1a" → abs (630, 360)
+- `alb-1`: x=80, y=80, parent="subnet-pub-1a" → abs (710, 440), center (740, 470)
 
 #### Check A — Short connection (source-target distance)
 
 ```text
-source_center = (source.x + source.width/2, source.y + source.height/2)
-target_center = (target.x + target.width/2, target.y + target.height/2)
-distance = sqrt((cx2-cx1)^2 + (cy2-cy1)^2)
+source_abs_cx = abs_x(source) + source.width/2
+source_abs_cy = abs_y(source) + source.height/2
+target_abs_cx = abs_x(target) + target.width/2
+target_abs_cy = abs_y(target) + target.height/2
 
-if distance < 200:
-    → label overlap risk with source or target icon
+distance = sqrt((target_abs_cx - source_abs_cx)^2 + (target_abs_cy - source_abs_cy)^2)
+
+if distance < 200 AND edge.value != "":
+    → WARNING: label overlap risk (source/target too close)
 ```
 
-#### Check B — Label midpoint proximity to ANY icon
+#### Check B — Label midpoint overlaps a third icon
 
-Estimate the default label position as the midpoint between source center and target center, then apply any `<mxPoint as="offset">` adjustment:
+Estimate the edge label's rendered position as the midpoint between source and target absolute centers, plus any `<mxPoint as="offset">` value:
 
 ```text
-label_x = (source_center.x + target_center.x) / 2 + offset_x  (default offset = 0)
-label_y = (source_center.y + target_center.y) / 2 + offset_y  (default offset = 0)
+label_abs_x = (source_abs_cx + target_abs_cx) / 2 + offset_x   [offset defaults to 0]
+label_abs_y = (source_abs_cy + target_abs_cy) / 2 + offset_y   [offset defaults to 0]
 ```
 
-> **Note**: source/target coordinates are relative to their parent container. Convert to absolute by adding the parent container's absolute position (recursively up the parent chain) before computing label_x/label_y.
-
-For every icon cell that is **not** the edge's source or target:
+For **every** icon cell that is **neither** the edge's source **nor** its target, check whether the label point falls inside that icon's effective area:
 
 ```text
-icon_abs_x = icon.x + sum of parent absolute x offsets
-icon_abs_y = icon.y + sum of parent absolute y offsets
+icon_eff_x1 = abs_x(icon) - 60         # 60px left of icon top-left
+icon_eff_x2 = abs_x(icon) + 120        # icon width (60px) + 60px right margin
+icon_eff_y1 = abs_y(icon) - 20         # 20px above icon top
+icon_eff_y2 = abs_y(icon) + 100        # icon height (60px) + 40px label below
 
-label_bbox_x1 = icon_abs_x - 60   (label text ~60px to the left of icon center)
-label_bbox_x2 = icon_abs_x + 120  (icon 60px + 60px right margin)
-label_bbox_y1 = icon_abs_y - 20   (icon top)
-label_bbox_y2 = icon_abs_y + 100  (icon 60px + 40px label below)
-
-if label_x in [label_bbox_x1, label_bbox_x2] AND label_y in [label_bbox_y1, label_bbox_y2]:
-    → edge label overlaps with this icon
+if (icon_eff_x1 <= label_abs_x <= icon_eff_x2) AND
+   (icon_eff_y1 <= label_abs_y <= icon_eff_y2):
+    → WARNING: edge label overlaps icon
 ```
 
-**Violation**: Report edge ID, label text, source/target IDs, center distance (Check A), and for Check B report the overlapping icon ID and approximate label position.
+**Concrete example** (must check this pattern in every diagram):
+
+A vertical edge from `user-1` (abs center 230, 190) to `cf-1` (abs center 230, 570) with label "HTTPS":
+
+- label midpoint = ((230+230)/2, (190+570)/2) = **(230, 380)**
+- `waf-1` at abs (200, 360), eff area: x∈[140,320], y∈[340,460]
+- 230 ∈ [140,320] ✓ and 380 ∈ [340,460] ✓ → **VIOLATION: "HTTPS" overlaps waf-1**
+
+> **Special pattern — same-column vertical edges**: When source and target share nearly the same x-coordinate (|source_abs_cx − target_abs_cx| < 60px) and an intermediate icon sits between them vertically in the same column, the label midpoint will fall exactly on that intermediate icon. Always flag this as a violation.
+
+**Violation**: Report edge ID, label text, and for each violation:
+
+- Check A: source/target IDs and actual distance
+- Check B: overlapping icon ID, icon effective area, and computed label midpoint (x, y)
 
 ### R11 — Containers Have Children (INFO)
 
