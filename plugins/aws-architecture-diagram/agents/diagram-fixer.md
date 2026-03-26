@@ -68,6 +68,7 @@ Scan the reviewer report for violations with severity **CRITICAL** or **ERROR** 
 | R02 — Missing Layer | Add the missing layer `mxCell` element |
 | R03 — Duplicate ID | Rename duplicate IDs (add `_2` suffix) and update all edge references |
 | R04 — Icon Spacing | Rearrange icons in same-parent groups to grid coordinates |
+| R05 — Icon Label Position | Add `verticalLabelPosition=bottom;verticalAlign=top;` to resource icon styles |
 | R09 — Edge Style | Add `edgeStyle=orthogonalEdgeStyle` to edge `style` attributes |
 | R10 — Edge Label Proximity | Add or adjust `<mxPoint as="offset">` on violating edges |
 
@@ -76,6 +77,24 @@ Scan the reviewer report for violations with severity **CRITICAL** or **ERROR** 
 ### Step 4: Apply Fixes
 
 Apply fixes in this order to avoid cascading conflicts:
+
+#### R05 — Fix Icon Label Position
+
+For each resource icon cell reported as missing `verticalLabelPosition=bottom` or `verticalAlign=top`:
+
+1. Locate the `mxCell` by its reported ID
+2. In its `style` attribute, add both properties immediately after the shape/resIcon declaration:
+   - If `verticalLabelPosition=bottom` is absent: insert `verticalLabelPosition=bottom;`
+   - If `verticalAlign=top` is absent: insert `verticalAlign=top;`
+
+Example transformation:
+
+```text
+Before: style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ec2;labelBackgroundColor=none;..."
+After:  style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ec2;verticalLabelPosition=bottom;verticalAlign=top;labelBackgroundColor=none;..."
+```
+
+Apply to **all** reported cells — do not fix one at a time.
 
 #### R02 — Add Missing Layers
 

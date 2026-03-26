@@ -1,0 +1,207 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2339" pageHeight="1654" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- Layer definitions -->
+    <mxCell id="layer-0" value="Layer 0: アカウント/リージョン" style="" vertex="1" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="layer-1" value="Layer 1: ネットワーク" style="" vertex="1" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="layer-2" value="Layer 2: セキュリティ" style="" vertex="1" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="layer-3" value="Layer 3: アプリケーション" style="" vertex="1" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="layer-4" value="Layer 4: データ" style="" vertex="1" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="layer-5" value="Layer 5: 監視・運用" style="" vertex="1" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- ===== LAYER 0: AWS Account / Region ===== -->
+    <mxCell id="aws-account" value="AWS Account" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_account;grStroke=1;verticalLabelPosition=top;verticalAlign=bottom;labelBackgroundColor=none;sketch=0;fontStyle=1;fontSize=14;fillColor=none;strokeColor=#CD2264;" vertex="1" parent="layer-0">
+      <mxGeometry x="60" y="60" width="1780" height="1300" as="geometry" />
+    </mxCell>
+    <mxCell id="aws-region" value="ap-northeast-1" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_region;grStroke=1;verticalLabelPosition=top;verticalAlign=bottom;labelBackgroundColor=none;sketch=0;fontStyle=1;fontSize=12;fillColor=none;strokeColor=#00A4A6;" vertex="1" parent="aws-account">
+      <mxGeometry x="20" y="40" width="1740" height="1240" as="geometry" />
+    </mxCell>
+
+    <!-- ===== LAYER 1: ネットワーク ===== -->
+    <!-- VPC -->
+    <mxCell id="vpc-main" value="AppVpc&#xa;10.0.0.0/16" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_vpc2;grStroke=1;verticalLabelPosition=top;verticalAlign=bottom;labelBackgroundColor=none;sketch=0;fontStyle=1;fontSize=12;fillColor=none;strokeColor=#8C4FFF;" vertex="1" parent="layer-1">
+      <mxGeometry x="370" y="100" width="1360" height="1060" as="geometry" />
+    </mxCell>
+
+    <!-- Internet Gateway -->
+    <mxCell id="igw-main" value="Internet Gateway" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.internet_gateway;verticalLabelPosition=bottom;verticalAlign=top;labelBackgroundColor=none;sketch=0;fontStyle=0;fontSize=10;" vertex="1" parent="vpc-main">
+      <mxGeometry x="620" y="40" width="60" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- AZ-a Public Subnet -->
+    <mxCell id="subnet-public-1a" value="Public Subnet AZ-a&#xa;10.0.0.0/24" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_public_subnet;grStroke=0;verticalLabelPosition=top;verticalAlign=bottom;labelBackgroundColor=none;sketch=0;fontSize=11;fillColor=#E6F3FF;strokeColor=#006EAF;" vertex="1" parent="vpc-main">
+      <mxGeometry x="40" y="120" width="380" height="220" as="geometry" />
+    </mxCell>
+
+    <!-- AZ-c Public Subnet -->
+    <mxCell id="subnet-public-1c" value="Public Subnet AZ-c&#xa;10.0.1.0/24" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_public_subnet;grStroke=0;verticalLabelPosition=top;verticalAlign=bottom;labelBackgroundColor=none;sketch=0;fontSize=11;fillColor=#E6F3FF;strokeColor=#006EAF;" vertex="1" parent="vpc-main">
+      <mxGeometry x="460" y="120" width="380" height="220" as="geometry" />
+    </mxCell>
+
+    <!-- NAT Gateway (in AZ-a Public Subnet) -->
+    <mxCell id="natgw-main" value="NAT Gateway&#xa;(AZ-a)" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.nat_gateway;verticalLabelPosition=bottom;verticalAlign=top;labelBackgroundColor=none;sketch=0;fontStyle=0;fontSize=10;" vertex="1" parent="subnet-public-1a">
+      <mxGeometry x="60" y="60" width="60" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- AZ-a Private Subnet -->
+    <mxCell id="subnet-private-1a" value="Private Subnet AZ-a&#xa;10.0.2.0/24" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_private_subnet;grStroke=0;verticalLabelPosition=top;verticalAlign=bottom;labelBackgroundColor=none;sketch=0;fontSize=11;fillColor=#F0F8E8;strokeColor=#3F8624;" vertex="1" parent="vpc-main">
+      <mxGeometry x="40" y="420" width="300" height="200" as="geometry" />
+    </mxCell>
+
+    <!-- AZ-c Private Subnet -->
+    <mxCell id="subnet-private-1c" value="Private Subnet AZ-c&#xa;10.0.3.0/24" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_private_subnet;grStroke=0;verticalLabelPosition=top;verticalAlign=bottom;labelBackgroundColor=none;sketch=0;fontSize=11;fillColor=#F0F8E8;strokeColor=#3F8624;" vertex="1" parent="vpc-main">
+      <mxGeometry x="380" y="420" width="300" height="200" as="geometry" />
+    </mxCell>
+
+    <!-- AZ-a Isolated Subnet -->
+    <mxCell id="subnet-isolated-1a" value="Isolated Subnet AZ-a&#xa;10.0.4.0/24" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_private_subnet;grStroke=0;verticalLabelPosition=top;verticalAlign=bottom;labelBackgroundColor=none;sketch=0;fontSize=11;fillColor=#FFF2E6;strokeColor=#E07A00;" vertex="1" parent="vpc-main">
+      <mxGeometry x="720" y="420" width="280" height="200" as="geometry" />
+    </mxCell>
+
+    <!-- AZ-c Isolated Subnet -->
+    <mxCell id="subnet-isolated-1c" value="Isolated Subnet AZ-c&#xa;10.0.5.0/24" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_private_subnet;grStroke=0;verticalLabelPosition=top;verticalAlign=bottom;labelBackgroundColor=none;sketch=0;fontSize=11;fillColor=#FFF2E6;strokeColor=#E07A00;" vertex="1" parent="vpc-main">
+      <mxGeometry x="1040" y="420" width="280" height="200" as="geometry" />
+    </mxCell>
+
+    <!-- ===== LAYER 2: セキュリティ ===== -->
+    <!-- WAF (外部、CloudFront用) [R10 fix: y=460→520 でcloudfront-mainとの距離220px確保] -->
+    <mxCell id="waf-main" value="AWS WAF&#xa;(CloudFront scope)" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.waf;verticalLabelPosition=bottom;verticalAlign=top;labelBackgroundColor=none;sketch=0;fontStyle=0;fontSize=10;" vertex="1" parent="layer-2">
+      <mxGeometry x="110" y="520" width="60" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- ===== LAYER 3: アプリケーション ===== -->
+    <!-- User/Client (外部) [R10 fix: y=120→60 でcloudfront-mainとの距離240px確保] -->
+    <mxCell id="user-client" value="ユーザー" style="shape=mxgraph.aws4.user;verticalLabelPosition=bottom;verticalAlign=top;labelBackgroundColor=none;sketch=0;fontStyle=0;fontSize=11;" vertex="1" parent="layer-3">
+      <mxGeometry x="110" y="60" width="60" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- CloudFront (外部) -->
+    <mxCell id="cloudfront-main" value="CloudFront&#xa;(AppCDN)" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudfront;verticalLabelPosition=bottom;verticalAlign=top;labelBackgroundColor=none;sketch=0;fontStyle=0;fontSize=10;" vertex="1" parent="layer-3">
+      <mxGeometry x="110" y="300" width="60" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- ALB (in Public Subnet AZ-a, VPC内) -->
+    <mxCell id="alb-main" value="Application Load Balancer&#xa;(internet-facing)" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.application_load_balancer;verticalLabelPosition=bottom;verticalAlign=top;labelBackgroundColor=none;sketch=0;fontStyle=0;fontSize=10;" vertex="1" parent="subnet-public-1a">
+      <mxGeometry x="260" y="60" width="60" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- ECS Fargate Task AZ-a (in Private Subnet AZ-a) -->
+    <mxCell id="ecs-task-1a" value="ECS Fargate&#xa;(nginx, 512CPU/1GB)" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.fargate;verticalLabelPosition=bottom;verticalAlign=top;labelBackgroundColor=none;sketch=0;fontStyle=0;fontSize=10;" vertex="1" parent="subnet-private-1a">
+      <mxGeometry x="60" y="70" width="60" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- ECS Fargate Task AZ-c (in Private Subnet AZ-c) -->
+    <mxCell id="ecs-task-1c" value="ECS Fargate&#xa;(nginx, 512CPU/1GB)" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.fargate;verticalLabelPosition=bottom;verticalAlign=top;labelBackgroundColor=none;sketch=0;fontStyle=0;fontSize=10;" vertex="1" parent="subnet-private-1c">
+      <mxGeometry x="60" y="70" width="60" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- ECS Cluster label -->
+    <mxCell id="ecs-cluster" value="ECS Cluster: AppCluster&#xa;desiredCount=2" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ecs;verticalLabelPosition=bottom;verticalAlign=top;labelBackgroundColor=none;sketch=0;fontStyle=0;fontSize=10;" vertex="1" parent="layer-3">
+      <mxGeometry x="490" y="940" width="60" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- ===== LAYER 4: データ ===== -->
+    <!-- S3 Bucket (外部/VPC外) -->
+    <mxCell id="s3-assets" value="S3 Bucket&#xa;(AssetsBucket)" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;verticalLabelPosition=bottom;verticalAlign=top;labelBackgroundColor=none;sketch=0;fontStyle=0;fontSize=10;" vertex="1" parent="layer-4">
+      <mxGeometry x="110" y="640" width="60" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- Aurora Writer (in Isolated Subnet AZ-a) -->
+    <mxCell id="aurora-writer" value="Aurora MySQL&#xa;Writer (t3.medium)" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.aurora;verticalLabelPosition=bottom;verticalAlign=top;labelBackgroundColor=none;sketch=0;fontStyle=0;fontSize=10;" vertex="1" parent="subnet-isolated-1a">
+      <mxGeometry x="60" y="70" width="60" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- Aurora Reader (in Isolated Subnet AZ-c) -->
+    <mxCell id="aurora-reader" value="Aurora MySQL&#xa;Reader1" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.aurora;verticalLabelPosition=bottom;verticalAlign=top;labelBackgroundColor=none;sketch=0;fontStyle=0;fontSize=10;" vertex="1" parent="subnet-isolated-1c">
+      <mxGeometry x="60" y="70" width="60" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- ===== LAYER 5: 監視・運用 ===== -->
+    <!-- CloudWatch Dashboard -->
+    <mxCell id="cloudwatch-dashboard" value="CloudWatch&#xa;(WebApp-Dashboard)" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudwatch;verticalLabelPosition=bottom;verticalAlign=top;labelBackgroundColor=none;sketch=0;fontStyle=0;fontSize=10;" vertex="1" parent="layer-5">
+      <mxGeometry x="110" y="820" width="60" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- ===== EDGES / CONNECTIONS ===== -->
+
+    <!-- User → CloudFront (HTTPS) [R10 Check A fix: offset x=120] -->
+    <mxCell id="edge-user-to-cf" value="HTTPS" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#ffffff;labelBorderColor=none;fontSize=10;" edge="1" source="user-client" target="cloudfront-main" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint as="offset" x="120" y="0" />
+      </mxGeometry>
+    </mxCell>
+
+    <!-- WAF → CloudFront (WebACL) [R10 Check A fix: offset x=120] -->
+    <mxCell id="edge-waf-to-cf" value="WebACL" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;labelBackgroundColor=#ffffff;labelBorderColor=none;fontSize=10;" edge="1" source="waf-main" target="cloudfront-main" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint as="offset" x="120" y="0" />
+      </mxGeometry>
+    </mxCell>
+
+    <!-- CloudFront → ALB (HTTPS, default behavior) [R10 Check B fix: offset y=120] -->
+    <mxCell id="edge-cf-to-alb" value="HTTPS&#xa;(default)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#ffffff;labelBorderColor=none;fontSize=10;" edge="1" source="cloudfront-main" target="alb-main" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint as="offset" x="0" y="120" />
+      </mxGeometry>
+    </mxCell>
+
+    <!-- CloudFront → S3 (HTTPS, /assets/*) [R10 Check B fix: offset x=120] -->
+    <mxCell id="edge-cf-to-s3" value="/assets/*" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#ffffff;labelBorderColor=none;fontSize=10;" edge="1" source="cloudfront-main" target="s3-assets" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint as="offset" x="120" y="0" />
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ALB → ECS Task AZ-a (HTTP:80) -->
+    <mxCell id="edge-alb-to-ecs-1a" value="HTTP:80" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#ffffff;labelBorderColor=none;fontSize=10;" edge="1" source="alb-main" target="ecs-task-1a" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- ALB → ECS Task AZ-c (HTTP:80) -->
+    <mxCell id="edge-alb-to-ecs-1c" value="HTTP:80" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#ffffff;labelBorderColor=none;fontSize=10;" edge="1" source="alb-main" target="ecs-task-1c" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- ECS Task AZ-a → Aurora Writer (MySQL:3306) [R10 Check B fix: offset y=120] -->
+    <mxCell id="edge-ecs-1a-to-aurora" value="MySQL:3306" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#ffffff;labelBorderColor=none;fontSize=10;" edge="1" source="ecs-task-1a" target="aurora-writer" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint as="offset" x="0" y="120" />
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ECS Task AZ-c → Aurora Writer (MySQL:3306) -->
+    <mxCell id="edge-ecs-1c-to-aurora" value="MySQL:3306" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#ffffff;labelBorderColor=none;fontSize=10;" edge="1" source="ecs-task-1c" target="aurora-writer" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Aurora Writer → Aurora Reader (レプリケーション) -->
+    <mxCell id="edge-aurora-replication" value="Replication" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;labelBackgroundColor=#ffffff;labelBorderColor=none;fontSize=10;" edge="1" source="aurora-writer" target="aurora-reader" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- IGW → NAT Gateway -->
+    <mxCell id="edge-igw-to-nat" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="igw-main" target="natgw-main" parent="vpc-main">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- ECS Task AZ-a → CloudWatch (メトリクス) -->
+    <mxCell id="edge-ecs-to-cw" value="Metrics" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;labelBackgroundColor=#ffffff;labelBorderColor=none;fontSize=10;" edge="1" source="ecs-task-1a" target="cloudwatch-dashboard" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+  </root>
+</mxGraphModel>

@@ -288,10 +288,12 @@ Use AWS 2026 icon shapes. Consult `skills/drawio-xml-format/references/aws-shape
 **Resource icon pattern**:
 
 ```xml
-<mxCell id="ec2-1" value="Web Server\n(EC2 t3.medium)" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ec2;labelBackgroundColor=none;sketch=0;fontStyle=1;fontSize=11;" vertex="1" parent="layer-3">
+<mxCell id="ec2-1" value="Web Server\n(EC2 t3.medium)" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ec2;verticalLabelPosition=bottom;verticalAlign=top;labelBackgroundColor=none;sketch=0;fontStyle=1;fontSize=11;" vertex="1" parent="layer-3">
   <mxGeometry x="400" y="300" width="60" height="60" as="geometry" />
 </mxCell>
 ```
+
+> **必須**: `verticalLabelPosition=bottom;verticalAlign=top;` はすべてのリソースアイコンに必ず含めること。これがないとラベルがアイコン画像の中央に重なって表示される。
 
 **Container/group pattern (VPC, Subnet)**:
 

@@ -112,6 +112,17 @@ All `id` attribute values must be unique across the entire document.
 
 **Violation**: List duplicate IDs.
 
+### R05 — Icon Label Position (ERROR)
+
+All resource icon cells (`style` containing `shape=mxgraph.aws4.resourceIcon` or `shape=mxgraph.aws4.user` or other `shape=mxgraph.aws4.<service>` non-group shapes with `vertex="1"` and `width` between 40–80) **must** have both of the following in their `style` attribute:
+
+- `verticalLabelPosition=bottom`
+- `verticalAlign=top`
+
+Without these, the label text renders over the icon image, making both unreadable.
+
+**Violation**: Report cell ID, current style value, and the two missing properties.
+
 ### R04 — Icon Spacing Insufficient (ERROR)
 
 For every pair of **resource icon** cells that share the **same `parent`** (cells with `style` containing `resourceIcon` or `shape=mxgraph.aws4.` and `vertex="1"` and `width` between 40–80), check the spacing requirements:
