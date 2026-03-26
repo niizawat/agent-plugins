@@ -86,6 +86,7 @@ If PNG is generated successfully, use the Read tool to load the PNG image and vi
 ### R01 — XML Structure (CRITICAL)
 
 Verify:
+
 - File contains `<mxGraphModel` root element
 - Contains `<root>` element
 - Contains `<mxCell id="0" />` and `<mxCell id="1" parent="0" />`
@@ -140,7 +141,7 @@ Same column (|x1 - x2| < 120): |y1 - y2| must be >= 180px
 Check that resource icons are placed on the correct layer based on their shape/label:
 
 | Service keywords in style or label | Expected layer parent |
-|------------------------------------|-----------------------|
+| ---------------------------------- | --------------------- |
 | `waf`, `web_acl` | layer-2 |
 | `shield`, `cognito`, `acm`, `security_group`, `nacl` | layer-2 |
 | `ec2`, `ecs`, `eks`, `lambda`, `alb`, `nlb`, `application_load_balancer`, `api_gateway`, `cloudfront`, `appsync` | layer-3 |
@@ -164,7 +165,7 @@ All edge cells (`edge="1"`) should have `edgeStyle=orthogonalEdgeStyle` in their
 
 **Violation**: Report edge IDs that use a different or no edge style.
 
-### R10 — Edge Label Proximity to Icons (WARNING)
+### R10 — Edge Label Proximity to Icons (ERROR)
 
 For every edge with a non-empty `value` (label), run **two independent checks**.
 
@@ -197,7 +198,7 @@ target_abs_cy = abs_y(target) + target.height/2
 distance = sqrt((target_abs_cx - source_abs_cx)^2 + (target_abs_cy - source_abs_cy)^2)
 
 if distance < 200 AND edge.value != "":
-    → WARNING: label overlap risk (source/target too close)
+    → ERROR: label overlap risk (source/target too close)
 ```
 
 #### Check B — Label midpoint overlaps a third icon
@@ -219,7 +220,7 @@ icon_eff_y2 = abs_y(icon) + 100        # icon height (60px) + 40px label below
 
 if (icon_eff_x1 <= label_abs_x <= icon_eff_x2) AND
    (icon_eff_y1 <= label_abs_y <= icon_eff_y2):
-    → WARNING: edge label overlaps icon
+    → ERROR: edge label overlaps icon
 ```
 
 **Concrete example** (must check this pattern in every diagram):
