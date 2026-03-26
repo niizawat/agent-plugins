@@ -254,9 +254,21 @@ A vertical edge from `user-1` (abs center 230, 190) to `cf-1` (abs center 230, 5
 
 ### R11 — Containers Have Children (WARNING)
 
-VPC and Subnet group cells should have at least one child cell (resource or sub-container).
+VPC and Subnet group cells should have at least one resource icon or sub-container **visually rendered inside** them.
 
-**Violation**: Report empty container IDs.
+**XML check is insufficient** — resource icons may belong to a different layer (e.g., `layer-3`) yet be positioned over the container visually. Therefore, R11 must be evaluated from the **exported PNG image**, not from the `parent` attribute alone.
+
+**Check procedure (PNG-based)**:
+
+After exporting the PNG in Step 4, visually inspect each VPC/Subnet/AZ container:
+
+1. Identify all container cells (cells with `shape=mxgraph.aws4.group` in their style)
+2. For each container, look at the PNG region corresponding to that container's bounding box
+3. If **no AWS service icon** is visually rendered inside that bounding box, report a violation
+
+**Violation**: Report the container cell ID and label. Note "visual inspection: no icons rendered inside container bounds."
+
+> **Note**: Do NOT report R11 violations based on XML `parent` relationships alone. Only report if the container appears visually empty in the PNG.
 
 ### R12 — External Resources in Left Column (INFO)
 
