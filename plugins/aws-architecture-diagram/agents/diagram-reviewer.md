@@ -75,7 +75,7 @@ If PNG is generated successfully, use the Read tool to load the PNG image and vi
 5. **コンテナ収容** — アイコンが VPC / サブネットの枠内に完全に収まっているか
 6. **全体バランス** — 図全体が均等に配置されて読みやすいか
 
-視覚的に発見した問題は `VISUAL-WARNING` として報告する（XML ルール R01–R12 とは別扱い）。
+視覚的に発見した問題は `VISUAL-ERROR` として報告する（XML ルール R01–R12 とは別扱い）。VISUAL-ERROR は PASS/FAIL 判定に含める（ERROR と同等）。
 
 レビュー後、PNG ファイルは自動削除しない（ユーザーが確認できるよう残す）。
 
@@ -147,7 +147,7 @@ Same column (|x1 - x2| < 120): |y1 - y2| must be >= 180px
 
 **Violation**: Report each violating pair with: cell IDs, coordinates, actual distance, required distance, and recommended fix (e.g., "move `ecs-1` x from 200 to 400").
 
-### R07 — Layer Assignment (WARNING)
+### R07 — Layer Assignment (ERROR)
 
 Check that resource icons are placed on the correct layer based on their shape/label:
 
@@ -252,7 +252,7 @@ A vertical edge from `user-1` (abs center 230, 190) to `cf-1` (abs center 230, 5
 - Check A: source/target IDs and actual distance
 - Check B: overlapping icon ID, icon effective area, and computed label midpoint (x, y)
 
-### R11 — Containers Have Children (INFO)
+### R11 — Containers Have Children (WARNING)
 
 VPC and Subnet group cells should have at least one child cell (resource or sub-container).
 
@@ -280,12 +280,13 @@ After all checks, output a structured report:
 
 | 重大度 | 件数 | 判定 |
 |--------|------|------|
-| CRITICAL | N | ❌ / ✅ |
-| ERROR    | N | ❌ / ✅ |
-| WARNING  | N | ⚠️ / ✅ |
-| INFO     | N | ℹ️ |
+| CRITICAL      | N | ❌ / ✅ |
+| ERROR         | N | ❌ / ✅ |
+| VISUAL-ERROR  | N | ❌ / ✅ |
+| WARNING       | N | ⚠️ / ✅ |
+| INFO          | N | ℹ️ |
 
-**総合判定**: ✅ 合格 / ❌ 不合格（CRITICAL または ERROR が 1 件以上）
+**総合判定**: ✅ 合格 / ❌ 不合格（CRITICAL、ERROR、または VISUAL-ERROR が 1 件以上）
 
 ---
 
@@ -321,7 +322,7 @@ After all checks, output a structured report:
 
 ## Pass / Fail Criteria
 
-- **合格 (PASS)**: CRITICAL = 0 かつ ERROR = 0
-- **不合格 (FAIL)**: CRITICAL ≥ 1 または ERROR ≥ 1
+- **合格 (PASS)**: CRITICAL = 0 かつ ERROR = 0 かつ VISUAL-ERROR = 0
+- **不合格 (FAIL)**: CRITICAL ≥ 1 または ERROR ≥ 1 または VISUAL-ERROR ≥ 1
 
 不合格の場合、最も重大な違反から順に修正手順を提示し、ユーザーに `diagram-generator` で再生成または手動修正を依頼する。
