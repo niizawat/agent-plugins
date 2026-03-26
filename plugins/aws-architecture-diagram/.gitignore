@@ -1,0 +1,11 @@
+# IDE / editor tools
+.specstory/
+.cursor/
+.claude/
+
+# macOS
+.DS_Store
+*.bkp
+
+# Generated files (keep test outputs for review)
+# test-cdk-architecture.png  # keep as test artifact

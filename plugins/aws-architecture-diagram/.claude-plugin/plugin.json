@@ -1,0 +1,9 @@
+{
+  "name": "aws-architecture-diagram",
+  "version": "0.1.0",
+  "description": "IaCコード（CDK/CloudFormation/Terraform）またはシステム要件からAWSアーキテクチャ構成図をDrawIO形式で自動生成するサブエージェントプラグイン",
+  "author": {
+    "name": "niizawa.tadashi"
+  },
+  "keywords": ["aws", "drawio", "architecture", "diagram", "iac", "cdk", "cloudformation", "terraform"]
+}
