@@ -250,37 +250,28 @@ Generate a valid DrawIO XML document with this structure:
 <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2339" pageHeight="1654" math="0" shadow="0">
   <root>
     <mxCell id="0" />
-    <mxCell id="1" parent="0" />
-    <!-- Layer definitions (children of cell 1) -->
-    <!-- Shapes and connections (children of layer cells) -->
+    <mxCell id="1" value="背景" parent="0" />
+    <!-- Layer definitions: direct children of id="0" (parent="0") -->
+    <!-- Shapes and connections: children of layer cells -->
   </root>
 </mxGraphModel>
 ```
 
 ### Layer Definitions
 
-Define all 6 layers as mxCell elements with parent="1":
+**CRITICAL**: Layer cells must have `parent="0"` (direct child of the root cell `id="0"`). Do NOT use `parent="1"` and do NOT add `vertex="1"`. This is what makes DrawIO recognize them as layers in the Layers panel.
 
 ```xml
-<mxCell id="layer-0" value="Layer 0: アカウント/リージョン" style="" vertex="1" parent="1">
-  <mxGeometry relative="1" as="geometry" />
-</mxCell>
-<mxCell id="layer-1" value="Layer 1: ネットワーク" style="" vertex="1" parent="1">
-  <mxGeometry relative="1" as="geometry" />
-</mxCell>
-<mxCell id="layer-2" value="Layer 2: セキュリティ" style="" vertex="1" parent="1">
-  <mxGeometry relative="1" as="geometry" />
-</mxCell>
-<mxCell id="layer-3" value="Layer 3: アプリケーション" style="" vertex="1" parent="1">
-  <mxGeometry relative="1" as="geometry" />
-</mxCell>
-<mxCell id="layer-4" value="Layer 4: データ" style="" vertex="1" parent="1">
-  <mxGeometry relative="1" as="geometry" />
-</mxCell>
-<mxCell id="layer-5" value="Layer 5: 監視・運用" style="" vertex="1" parent="1">
-  <mxGeometry relative="1" as="geometry" />
-</mxCell>
+<mxCell id="layer-0" value="アカウント/リージョン" parent="0" />
+<mxCell id="layer-1" value="ネットワーク" parent="0" />
+<mxCell id="layer-2" value="セキュリティ" parent="0" />
+<mxCell id="layer-3" value="アプリケーション" parent="0" />
+<mxCell id="layer-4" value="データ" parent="0" />
+<mxCell id="layer-5" value="監視・運用" parent="0" />
 ```
+
+> **Wrong** (will NOT appear as layers in DrawIO):
+> `<mxCell id="layer-0" value="..." style="" vertex="1" parent="1">` ← parent="1" and vertex="1" make this a shape, not a layer
 
 ### AWS Resource Shapes
 
@@ -320,7 +311,7 @@ Use AWS 2026 icon shapes. Consult `skills/drawio-xml-format/references/aws-shape
 
 | Cell type | `parent` value |
 |-----------|----------------|
-| Layer cells (layer-0 through layer-5) | `"1"` |
+| Layer cells (layer-0 through layer-5) | `"0"` ← must be direct child of root |
 | Top-level containers (AWS Account, Region) | layer ID (e.g., `"layer-0"`) |
 | VPC container | layer ID (e.g., `"layer-1"`) |
 | AZ group, Subnet group | their direct parent container ID (e.g., `"vpc-main"`) |

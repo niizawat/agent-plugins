@@ -103,15 +103,17 @@ Apply to **all** reported cells — do not fix one at a time.
 The 6 required layers are:
 
 ```xml
-<mxCell id="layer-0" value="アカウント/リージョン" style="locked=1;" parent="1" />
-<mxCell id="layer-1" value="ネットワーク" style="locked=1;" parent="1" />
-<mxCell id="layer-2" value="セキュリティ" style="locked=1;" parent="1" />
-<mxCell id="layer-3" value="アプリケーション" style="locked=1;" parent="1" />
-<mxCell id="layer-4" value="データ" style="locked=1;" parent="1" />
-<mxCell id="layer-5" value="監視・運用" style="locked=1;" parent="1" />
+<mxCell id="layer-0" value="アカウント/リージョン" parent="0" />
+<mxCell id="layer-1" value="ネットワーク" parent="0" />
+<mxCell id="layer-2" value="セキュリティ" parent="0" />
+<mxCell id="layer-3" value="アプリケーション" parent="0" />
+<mxCell id="layer-4" value="データ" parent="0" />
+<mxCell id="layer-5" value="監視・運用" parent="0" />
 ```
 
-Insert missing layer cells immediately after `<mxCell id="1" parent="0" />` (before any other cells).
+**CRITICAL**: Layer cells must have `parent="0"` and NO `vertex="1"` attribute. Using `parent="1"` with `vertex="1"` creates a shape inside the background layer, not a DrawIO layer.
+
+Insert missing layer cells immediately after `<mxCell id="0" />` (before any other cells).
 
 #### R03 — Fix Duplicate IDs
 

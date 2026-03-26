@@ -89,13 +89,15 @@ Verify:
 
 - File contains `<mxGraphModel` root element
 - Contains `<root>` element
-- Contains `<mxCell id="0" />` and `<mxCell id="1" parent="0" />`
+- Contains `<mxCell id="0" />`
 
 **Violation**: Report exact missing element.
 
 ### R02 — All 6 Layers Defined (CRITICAL)
 
-The following layer IDs must all be present as `mxCell` elements with `parent="1"`:
+The following layer IDs must all be present as `mxCell` elements with **`parent="0"`** and **no `vertex` attribute** (these conditions make DrawIO recognize them as layers in the Layers panel):
+
+> **Note**: `parent="1"` with `vertex="1"` creates an ordinary shape inside the background layer, NOT a DrawIO layer. Always verify `parent="0"` and absence of `vertex="1"`.
 
 - `layer-0` — アカウント/リージョン
 - `layer-1` — ネットワーク
