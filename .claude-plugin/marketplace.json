@@ -8,6 +8,11 @@
       "name": "install-cursor-plugin",
       "source": "./plugins/install-cursor-plugin",
       "version": "1.0.0"
+    },
+    {
+      "name": "aws-architecture-diagram",
+      "source": "./plugins/aws-architecture-diagram",
+      "version": "0.1.0"
     }
   ]
 }
