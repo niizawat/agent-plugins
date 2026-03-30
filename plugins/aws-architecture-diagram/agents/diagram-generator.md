@@ -156,7 +156,7 @@ Use a grid-based coordinate system. Standard measurements:
 
 **Layout algorithm**:
 
-1. Start with the outermost container (AWS Account/Region) at (80, 80)
+1. Start with the outermost container (AWS Account/Region) at **(200, 40)** — not (40, 40). Offset right by 160px to reserve space at x=40 for non-AWS resources (User, Internet) that must sit outside the Account boundary
 2. Place VPC inside, with subnets arranged left-to-right by type (public → private → isolated)
 3. Within each subnet, arrange resources in rows by layer (application row, then data row)
 4. Place external resources (CloudFront, Route53, users) to the left or top of VPC
@@ -168,13 +168,30 @@ Use a grid-based coordinate system. Standard measurements:
 Place external/CDN/security resources in a vertical column to the LEFT of the VPC container, ordered top-to-bottom by traffic flow:
 
 ```text
-x=80   x=360 (VPC start)
-User   |
-R53    |  VPC
-WAF    |
-CF     |
-       |
+x=40   x=220  x=500 (VPC start)
+User   |      |
+       R53    |  VPC
+       WAF    |
+       CF     |
+              |
 ```
+
+**CRITICAL**: Non-AWS resources (User/Client, Internet users, external systems) MUST be placed **outside** (to the left of) the AWS Account Group container. The AWS Account Group container represents the account boundary — only AWS services belong inside it.
+
+- **Outside AWS Account** (`x < account.x`): `user`, `internet`, external clients, on-premises systems
+- **Inside AWS Account, outside VPC** (`account.x ≤ x < vpc.x`): `cloudfront`, `route53`, `waf`, `shield` (global AWS services)
+- **Inside VPC**: subnets, EC2, ECS, RDS, etc.
+
+**座標のルール（新規作成時）**: 座標は必ず正の値を使用すること。非 AWS リソース（User 等）を左端に配置するために、AWS Account Group コンテナを右にオフセットして外部リソース用のスペースを確保する。
+
+標準的な x 座標配置（新規作成時の推奨値）:
+
+- Non-AWS resources (User, Internet): `x = 40` (最左端)
+- AWS Account Group container: `x = 200`（非 AWS リソース用に 160px のスペースを確保）
+- AWS global services (CloudFront, WAF, Route53): `x = 280`（Account 内、VPC 左）
+- VPC container: `x = 500`
+
+> **修正時の例外**: 既存図の修正時は、全体レイアウトを崩さないために負の座標を一時的に使用することを許容する。
 
 Assign specific Y coordinates to prevent overlap:
 
@@ -304,6 +321,8 @@ Use AWS 2026 icon shapes. Consult `skills/drawio-xml-format/references/aws-shape
 ```
 
 > **必須**: `jumpStyle=arc` は全エッジに必ず含めること。線が交差する箇所で円弧ジャンプを表示し、接続関係を視覚的に区別できるようにする。
+>
+> **エッジの parent**: エッジは必ず名前付きレイヤー（`layer-1` 〜 `layer-5`）を `parent` に設定すること。`parent="1"`（背景レイヤー）は **絶対に使用しない**。背景レイヤーはすべてのコンテナより下に描画されるため、エッジがコンテナの背面に隠れる。エッジの parent は source リソースのレイヤーを使用する（例: ALB → ECS 間のエッジは `parent="layer-3"`）。
 
 ### Parent Assignment Rules
 
@@ -317,7 +336,7 @@ Use AWS 2026 icon shapes. Consult `skills/drawio-xml-format/references/aws-shape
 | AZ group, Subnet group | their direct parent container ID (e.g., `"vpc-main"`) |
 | Resource icons inside a subnet | the subnet's ID (e.g., `"subnet-public-1a"`) |
 | Resource icons outside VPC (CloudFront, WAF, Route53) | layer ID (e.g., `"layer-3"` or `"layer-2"`) |
-| Edges | the layer ID of the source resource (or `"1"` for cross-layer edges) |
+| Edges | the layer ID of the source resource — **never `"1"` (背景)**. For cross-layer edges, use the source resource's layer (e.g., `layer-3` for an edge from an application icon to a data icon) |
 
 **Never** set `parent` to a layer ID for a resource that lives inside a container. The resource must be a child of the innermost container it belongs to.
 
@@ -377,6 +396,92 @@ File → Open → ファイルを選択 または ファイルをブラウザに
 
 ---
 
+## Generation Prohibition Rules
+
+These rules address common XML generation mistakes that cause visual defects. Violating them results in diagrams that **pass XML validation but render incorrectly** in DrawIO.
+
+### G-R13 — テキストセルへの `autosize=1` 禁止
+
+`autosize=1` スタイル属性は DrawIO がレンダリング時に x/y 座標を自動再計算・上書きするため、テキストラベルが意図しない位置に表示される。
+
+**ルール**: `shape=mxgraph.` を含まない `vertex="1"` のテキストセル（ラベルセル、説明テキスト等）に `autosize=1` を設定してはならない。
+
+```xml
+<!-- ❌ 禁止: autosize=1 によって x/y が無視される -->
+<mxCell id="ecs-cluster" value="ECS Cluster" style="text;autosize=1;..." vertex="1">
+  <mxGeometry x="440" y="550" width="200" height="30" as="geometry"/>
+</mxCell>
+
+<!-- ✅ 正しい: autosize=1 なし、明示的な width/height を指定 -->
+<mxCell id="ecs-cluster" value="ECS Cluster" style="text;html=1;align=center;strokeColor=none;fillColor=none;fontStyle=1;fontSize=11;" vertex="1">
+  <mxGeometry x="440" y="550" width="800" height="30" as="geometry"/>
+</mxCell>
+```
+
+### G-R14 — 複数 AZ に跨るリソースのラベル統一
+
+同一の論理リソース（例: Multi-AZ 配置の ALB、RDS Replica 等）を複数の AZ コンテナ内にアイコンとして配置する場合、**すべてのセルの `value` 属性を同一文字列**にする。
+
+**ルール**: 同じ `shape=mxgraph.aws4.*` パターンを持つセルが複数 AZ コンテナに存在する場合、`value` は AZ 間で一致させる。
+
+```xml
+<!-- ❌ 禁止: AZ ごとに異なるラベル -->
+<mxCell id="alb-1a" value="Application Load Balancer (internet-facing)" .../>  <!-- AZ-1a -->
+<mxCell id="alb-1c" value="ALB (Multi-AZ)" .../>                               <!-- AZ-1c -->
+
+<!-- ✅ 正しい: 全 AZ で同一ラベル -->
+<mxCell id="alb-1a" value="Application Load Balancer&#xa;(internet-facing)" .../>  <!-- AZ-1a -->
+<mxCell id="alb-1c" value="Application Load Balancer&#xa;(internet-facing)" .../>  <!-- AZ-1c -->
+```
+
+### G-R15 — VPC コンテナはリージョンコンテナより 60px 以上下に配置
+
+DrawIO はコンテナの上端ボーダーをコンテナの y 座標に描画する。VPC コンテナとリージョンコンテナの絶対 y 座標が同一または近接していると、枠線が重なって視覚的に一本線に見える。
+
+**ルール**: VPC コンテナの絶対 y 座標は、リージョンコンテナの絶対 y 座標より **60px 以上**下に設定する。
+
+| コンテナ | 推奨 y（絶対座標）        |
+| -------- | ------------------------- |
+| region-1 | 100                       |
+| vpc-main | 160 以上（= 100 + 60px） |
+
+```xml
+<!-- ❌ 禁止: リージョンと VPC の y が同一 -->
+<mxCell id="region-1" ... vertex="1"><mxGeometry x="380" y="100" .../></mxCell>
+<mxCell id="vpc-main" ... vertex="1"><mxGeometry x="420" y="100" .../></mxCell>
+
+<!-- ✅ 正しい: VPC を 60px 以上下にオフセット -->
+<mxCell id="region-1" ... vertex="1"><mxGeometry x="380" y="100" .../></mxCell>
+<mxCell id="vpc-main" ... vertex="1"><mxGeometry x="420" y="160" .../></mxCell>
+```
+
+### G-R16 — エッジの exit/entry 方向はソース・ターゲットの相対位置で決定
+
+`exitX/exitY/entryX/entryY` の選択を誤ると、エッジが他のエッジや他のアイコンと交差する。ソースとターゲットの絶対中心座標を比較して方向を決定する。
+
+**ルール**: 以下の表に従って `exitX/exitY` および `entryX/entryY` を設定する。
+
+| ターゲットの相対位置 | exitX | exitY | entryX | entryY |
+| -------------------- | ----- | ----- | ------ | ------ |
+| ターゲットが右 (target_cx > source_cx) | 1 | 0.5 | 0 | 0.5 |
+| ターゲットが左 (target_cx < source_cx) | 0 | 0.5 | 1 | 0.5 |
+| ターゲットが真上 (target_cy < source_cy、x ≒ 同) | 0.5 | 0 | 0.5 | 1 |
+| ターゲットが真下 (target_cy > source_cy、x ≒ 同) | 0.5 | 1 | 0.5 | 0 |
+| ターゲットが右上 | 1 | 0.5 | 0.5 | 1 |
+| ターゲットが右下 | 1 | 0.5 | 0.5 | 0 |
+| ターゲットが左上 | 0 | 0.5 | 0.5 | 1 |
+| ターゲットが左下 | 0 | 0.5 | 0.5 | 0 |
+
+```xml
+<!-- ❌ 禁止: ターゲットが右側にあるのに exitX=0（左出口） -->
+<mxCell id="edge-ecs-to-nat" style="...exitX=0;exitY=0.5;entryX=1;entryY=0.5;..." .../>
+
+<!-- ✅ 正しい: ターゲットが右上方向のとき exitX=1（右出口）、entryY=1（下入口） -->
+<mxCell id="edge-ecs-to-nat" style="...exitX=1;exitY=0.5;entryX=0.5;entryY=1;..." .../>
+```
+
+---
+
 ## Quality Standards
 
 - **Completeness**: Every resource in the IaC/requirements appears in the diagram
@@ -385,6 +490,7 @@ File → Open → ファイルを選択 または ファイルをブラウザに
 - **Consistency**: Same icon style and label format throughout
 - **Layer integrity**: Each resource belongs to exactly one appropriate layer
 - **Valid XML**: The output must be valid XML that DrawIO can open without errors
+- **Generation rules**: G-R13 through G-R16 must be satisfied (no autosize=1 on text cells, unified AZ labels, VPC y-offset ≥ 60px, correct exit/entry directions)
 
 ## Skills Reference
 

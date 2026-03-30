@@ -1,7 +1,7 @@
 ---
 name: diagram-drawio-reviewer
 description: |
-  Use this agent when diagram-qa (or the user) wants to validate a DrawIO AWS architecture diagram file against XML layout rules (R01–R12, excluding R11). This agent checks XML structure only — no PNG export, no visual inspection. Examples:
+  Use this agent when diagram-qa (or the user) wants to validate a DrawIO AWS architecture diagram file against XML layout rules (R01–R16, excluding R06 and R11). This agent checks XML structure only — no PNG export, no visual inspection. Examples:
 
   <example>
   Context: diagram-qa calls this agent in parallel with diagram-image-reviewer
@@ -239,6 +239,71 @@ Cells with labels/styles matching `waf`, `cloudfront`, `route53`, `user`, `inter
 
 ---
 
+### R13 — Text Cell with autosize=1 (ERROR)
+
+A text cell is any `mxCell` with `vertex="1"` whose style does **not** contain `shape=mxgraph.` (i.e. a label/annotation cell, not an AWS icon). When such a cell has `autosize=1` in its style, DrawIO overwrites the stored x/y coordinates at render time, causing the label to appear at an unintended position.
+
+**Detection**:
+
+- For each `mxCell` with `vertex="1"`:
+  - If `style` does NOT contain `shape=mxgraph.` AND `style` contains `autosize=1`
+  - → VIOLATION
+
+**Violation**: Report cell ID, `value` (label text), and the full `style` attribute containing `autosize=1`.
+
+---
+
+### R14 — Multi-AZ Resource Label Inconsistency (WARNING)
+
+When the same logical AWS resource is deployed across multiple Availability Zones, each AZ contains a copy of its icon. All copies must share the same `value` attribute. Differing labels indicate an inconsistency between what the diagram says about the resource in each AZ.
+
+**Detection**:
+
+1. Extract the AWS shape identifier for each icon cell: the substring matching `shape=mxgraph\.aws4\.\w+` in the `style`.
+2. For each unique shape identifier, collect all cells that use it.
+3. Among those cells, determine which ones are placed inside AZ containers (parent chain includes a cell whose style contains `swimlane` and whose label contains `AZ` or `Availability Zone`).
+4. If two or more AZ-resident cells share the same shape identifier but have different `value` attributes → VIOLATION.
+
+**Violation**: Report the shape identifier, the AZ container IDs, and the conflicting `value` strings.
+
+---
+
+### R15 — VPC/Region Container y-Coordinate Gap Too Small (ERROR)
+
+If the VPC container's absolute top-edge y coordinate is less than 60px below the Region container's absolute top-edge y coordinate, the two container borders visually overlap and appear as a single line.
+
+**Detection**:
+
+1. Identify the Region container cell (style contains `swimlane` and label contains `region` or `リージョン`).
+2. Compute its absolute y: traverse the parent chain applying `abs_y += cell.y_relative` until reaching `parent="0"` or a layer cell.
+3. Identify the VPC container cell (style contains `swimlane` and label contains `VPC`).
+4. Compute its absolute y using the same method.
+5. If `abs_y(vpc) - abs_y(region) < 60` → VIOLATION.
+
+**Violation**: Report both cell IDs, their absolute y coordinates, and the computed gap (px).
+
+---
+
+### R16 — Edge Exit Direction Mismatch (WARNING)
+
+The `exitX`/`exitY` attributes on an edge determine which side of the source icon the connection leaves from. When `exitX=0` (left side) is set but the target icon is to the right of the source (abs center x of target > abs center x of source), the edge routes across the diagram and intersects other connections.
+
+**Detection**:
+
+For each `mxCell` with `edge="1"` that has explicit `exitX` in its style:
+
+1. Resolve `source` cell ID and `target` cell ID.
+2. Compute absolute center x of source: `abs_cx_src = abs_x(source) + source.width / 2`.
+3. Compute absolute center x of target: `abs_cx_tgt = abs_x(target) + target.width / 2`.
+4. Extract `exitX` value from the style string.
+5. Check for mismatch:
+   - `exitX=0` AND `abs_cx_tgt > abs_cx_src` → VIOLATION (target is right, but edge exits left)
+   - `exitX=1` AND `abs_cx_tgt < abs_cx_src` → VIOLATION (target is left, but edge exits right)
+
+**Violation**: Report edge ID, `value` (label), source/target cell IDs, `exitX` value, and the computed absolute center x of each endpoint.
+
+---
+
 ## Output Format
 
 After all checks, output a structured report:
@@ -280,6 +345,10 @@ After all checks, output a structured report:
 
 - ✅ R01: XML Structure
 - ✅ R02: All 6 Layers Defined
+- ✅ R13: No autosize=1 on text cells
+- ✅ R14: Multi-AZ label consistency
+- ✅ R15: VPC/Region y-coordinate gap ≥ 60px
+- ✅ R16: Edge exit direction matches target position
 - ...
 ```
 
